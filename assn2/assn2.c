@@ -27,12 +27,27 @@ void removeFirstElement(int *argc, char *argv[]) {
   argc--;
 }
 
+char *arraySlice(int *arrc, char *arr[], int start, int end) {
+  // Error end is beyond count of array
+  char *temp_arr[end - start];
+
+  // CHECK MY SHITTY ERROR HANDLING
+  if (*arrc < end) {
+    raise(1);
+  }
+
+  for (int i = start; i < end; i++) {
+    *temp_arr[i - start] = *arr[i];
+  }
+
+  return *temp_arr;
+}
+
 void multipleArguments(int *argc, char *argv[]) {
   char *command = argv[1];
   removeFirstElement(argc, argv);
 
   int status_code = execvp(command, argv);
-
   if (status_code == -1) {
     printf("PROCESS TERMINATED INCORRECTLY\n");
   }
