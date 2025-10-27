@@ -2,7 +2,6 @@
 #define CONSUMER_H
 
 #include "buffer.h"
-#include "datastruct.h"
 #include <math.h>
 #include <pthread.h>
 #include <stdio.h>

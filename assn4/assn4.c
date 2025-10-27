@@ -1,5 +1,4 @@
-// Dean Oakeson
-// CS3060-001 Fall 2025
+// Dean Oakeson CS3060-001 Fall 2025
 // Assn #4
 
 /* Promise of Originality
@@ -11,12 +10,12 @@
  */
 
 #include "buffer.h"
-#include "consumer.h"
-#include "datastruct.h"
+#include "c-stacktrace.h"
 #include "producer.h"
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 ////////////////////
 /// MAIN PROGRAM ///
@@ -24,43 +23,48 @@
 
 int main(int argc, char *argv[]) {
 
+  // TIMER ENTER
+  clock_t start, end;
+  double elapsed;
+  start = clock();
+
   printf("ENTERING MAIN\n");
+  init_exceptions(argv[0]);
 
-  //  if (atoi(argv[1]) < 0) {
-  //  printf(stderr, "%d must be >= 0\n", atoi(argv[1]));
-  // return -1;
-  //}
+  if (argc < 2) {
+    printf("%d must be >= 0\n", atoi(argv[1]));
+    return -1;
+  }
 
-  printf("INITIALIZING BUFFERS\n");
+  printf("INITIALIZING BUFFER\n");
 
   Buffer bufferOne;
-  Buffer bufferTwo;
 
   initialize(&bufferOne);
-  initialize(&bufferTwo);
 
-  struct thread_data *thread_data = malloc(sizeof(struct thread_data));
-  ;
-
-  thread_data->argc = argc;
-  thread_data->sum = 10;
-  thread_data->bufferOne = &bufferOne;
-  thread_data->bufferTwo = &bufferTwo;
-
-  pthread_t tid[0];
+  pthread_t tid;
   pthread_attr_t attr;
 
   pthread_attr_init(&attr);
 
-  printf("ARGC TEST: %d\n", thread_data->argc);
-
-  pthread_create(&tid[0], NULL, producer, thread_data);
+  pthread_create(&tid, &attr, producer, &bufferOne);
 
   for (int i = 1; i < argc; i++) {
     write(&bufferOne, atoi(argv[i]));
   }
 
-  pthread_join(tid[0], NULL);
+  write(&bufferOne, -1);
+
+  if (pthread_join(tid, NULL) != 0) {
+    printf("PRODUCER THREAD FAILED\n");
+  } else {
+    printf("PRODUCER THREAD FINISHED\n");
+  }
+
+  // TIMER EXIT
+  end = clock();
+  elapsed = ((double)(end - start)) / CLOCKS_PER_SEC;
+  printf("ELAPSED TIME: %f sec\n", elapsed);
 
   return 0;
 }

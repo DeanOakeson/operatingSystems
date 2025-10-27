@@ -9,20 +9,18 @@
 #include "buffer.h"
 
 pthread_mutex_t lock;
-pthread_cond_t cond;
+pthread_cond_t condNotEmpt;
+pthread_cond_t condNotFull;
 
 void initialize(Buffer *buffer) {
   buffer->read = 0;
   buffer->write = 0;
-
-  pthread_mutex_init(&lock, NULL);
-  pthread_cond_init(&cond, NULL);
+  buffer->count = 0;
 }
 
 bool isEmpty(Buffer *buffer) {
 
-  if (buffer->read % MAX_SIZE == buffer->write % MAX_SIZE) {
-    printf("EMPTY_BUFFER\n");
+  if (buffer->count == 0) {
     return true;
   }
   return false;
@@ -30,43 +28,54 @@ bool isEmpty(Buffer *buffer) {
 
 bool isFull(Buffer *buffer) {
 
-  if ((buffer->write + 1) % MAX_SIZE == buffer->read % MAX_SIZE) {
-    printf("FULL_BUFFER\n");
+  if (buffer->count == MAX_SIZE) {
     return true;
   }
   return false;
 }
 
 int read(Buffer *buffer) {
-  pthread_mutex_lock(&lock);
 
+  pthread_mutex_lock(&lock);
   while (isEmpty(buffer)) {
-    pthread_cond_wait(&cond, &lock);
+    pthread_cond_wait(&condNotEmpt, &lock);
   }
 
+  buffer->count--;
   int read = buffer->arr[buffer->read];
-  buffer->read = (buffer->read + 1) % MAX_SIZE;
-  printf("read %d\n", read);
 
-  pthread_cond_signal(&cond);
+  pthread_cond_signal(&condNotFull);
   pthread_mutex_unlock(&lock);
+
+  buffer->read = (buffer->read + 1) % MAX_SIZE;
   return read;
 }
 
-int write(Buffer *buffer, int value) {
-  pthread_mutex_lock(&lock);
+void write(Buffer *buffer, int value) {
 
-  if (isFull(buffer)) {
-    pthread_cond_wait(&cond, &lock);
+  pthread_mutex_lock(&lock);
+  while (isFull(buffer)) {
+    pthread_cond_wait(&condNotFull, &lock);
   }
 
+  buffer->count++;
   buffer->arr[buffer->write] = value;
-  buffer->write = (buffer->write + 1) % MAX_SIZE;
-  printf("wrote %d\n", value);
 
-  pthread_cond_signal(&cond);
+  pthread_cond_signal(&condNotEmpt);
   pthread_mutex_unlock(&lock);
-  return 0;
+
+  buffer->write = (buffer->write + 1) % MAX_SIZE;
+  return;
 }
 
-int peek(Buffer *buffer) { return buffer->read % MAX_SIZE; }
+int peek(Buffer *buffer) {
+
+  pthread_mutex_lock(&lock);
+  while (isEmpty(buffer)) {
+    // printf("Ep ");
+    pthread_cond_wait(&condNotEmpt, &lock);
+  }
+  pthread_mutex_unlock(&lock);
+
+  return buffer->arr[buffer->read];
+}

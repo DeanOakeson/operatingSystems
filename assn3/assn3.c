@@ -24,10 +24,10 @@ void *runner(void *param);
 
 int main(int argc, char *argv[]) {
 
+  // TIMER ENTER
   time_t start, end;
   double elapsed;
-
-  start = time(NULL);
+  start = clock();
 
   int *arr[MAX_SIZE];
 
@@ -67,11 +67,10 @@ int main(int argc, char *argv[]) {
 
   free(*arr);
 
-  end = time(NULL);
-
-  elapsed = difftime(end, start);
-
-  printf("ELAPSED TIME: %.2f sec\n", elapsed);
+  // TIMER EXIT
+  end = clock();
+  elapsed = ((double)end - start) / CLOCKS_PER_SEC;
+  printf("ELAPSED TIME: %f sec\n", elapsed);
 }
 
 //////////////////////

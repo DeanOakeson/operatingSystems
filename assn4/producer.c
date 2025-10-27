@@ -1,50 +1,53 @@
-
 #include "producer.h"
 
 void primeFactor(Buffer *buffer, int number) {
 
-  int *arr = (int *)malloc(10 * sizeof(int)); // RETURN ARRAY//
-  int arrIndex = 0;
+  write(buffer, number);
 
   if (number % 2 == 0) {
     while (number % 2 == 0) {
-      arr[arrIndex] = 2;
-      arrIndex += 1;
+      write(buffer, 2);
       number = number / 2;
     }
   }
   // DIVISIBLE BY ODD //
   for (int i = 3; i <= sqrt(number); i += 2) {
     while (number % i == 0) {
-      arr[arrIndex] = i;
-      arrIndex += 1;
+      write(buffer, i);
       number = number / i;
     }
   }
   // IF REMAINING IS PRIME //
   if (number > 2) {
-    arr[arrIndex] = number;
-    arrIndex += 1;
+    write(buffer, number);
   }
 
-  printf("%d\n", *arr);
-  write(buffer, *arr);
+  write(buffer, -11); // SENTINAL VALUE
 }
 
 void *producer(void *data) {
 
-  printf("PRODUCING\n");
+  Buffer *bufferOne = (Buffer *)data;
 
-  struct thread_data *passedData = (struct thread_data *)data;
-  Buffer *bufferOne = passedData->bufferOne;
-  // Buffer *bufferTwo = passedData->bufferTwo;
-  int argc = passedData->argc;
+  Buffer bufferTwo;
+  initialize(&bufferTwo);
 
-  printf("ARGC_TEST: %d\n", argc);
+  pthread_t tidTwo;
+  pthread_create(&tidTwo, NULL, consumer, &bufferTwo);
 
-  for (int i = 0; i < argc - 1; i++) {
-    int n = read(bufferOne);
-    printf("%d\n", n);
+  int i = read(bufferOne);
+
+  while (i != -1) {
+    primeFactor(&bufferTwo, i);
+    i = read(bufferOne);
+  }
+
+  write(&bufferTwo, -111); // SENTINAL VALUE
+
+  if (pthread_join(tidTwo, NULL) != 0) {
+    printf("CONSUMER THREAD FAILED\n");
+  } else {
+    printf("CONSUMER THREAD FINISHED\n");
   }
 
   pthread_exit(NULL);

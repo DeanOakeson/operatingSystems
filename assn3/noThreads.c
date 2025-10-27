@@ -27,8 +27,7 @@ int main(int argc, char *argv[]) {
 
   time_t start, end;
   double elapsed;
-
-  start = time(NULL);
+  start = clock();
 
   int *arr[MAX_SIZE];
 
@@ -58,10 +57,8 @@ int main(int argc, char *argv[]) {
     free(myarray);
   }
 
-  end = time(NULL);
-
-  elapsed = difftime(end, start);
-
+  end = clock();
+  elapsed = ((double)end - start) / CLOCKS_PER_SEC;
   printf("ELAPSED TIME: %.2f sec\n", elapsed);
 }
 

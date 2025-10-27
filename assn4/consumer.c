@@ -3,20 +3,19 @@
 
 void *consumer(void *data) {
 
+  Buffer *bufferTwo = (Buffer *)data;
   printf("CONSUMING\n");
 
-  struct thread_data *passedData = (struct thread_data *)data;
-  Buffer *bufferTwo = passedData->bufferTwo;
-  int argc = passedData->argc;
+  while (peek(bufferTwo) != -111) {
+    printf("%d: ", read(bufferTwo));
 
-  for (int i = 0; i >= argc - 1; i++) {
-    int *arr = (int *)malloc(10 * sizeof(int)); // RETURN ARRAY//
-    *arr = read(bufferTwo);
-    for (int i = 0; MAX_SIZE - 1 >= i; i++) {
-      if (arr[i] != 0) {
-        printf("%d", arr[i]);
-      }
+    while (peek(bufferTwo) != -11) {
+      printf("%d ", read(bufferTwo));
     }
+
+    read(bufferTwo); // CLEAR SENTINAL -11
+    printf("\n");
   }
-  return 0;
+  // read(bufferTwo);
+  pthread_exit(NULL);
 }

@@ -18,6 +18,7 @@
 typedef struct {
 
   int arr[MAX_SIZE];
+  int count;
   int write;
   int read;
 
@@ -31,7 +32,7 @@ bool isFull(Buffer *buffer);
 
 int read(Buffer *buffer);
 
-int write(Buffer *buffer, int value);
+void write(Buffer *buffer, int value);
 
 int peek(Buffer *buffer);
 
