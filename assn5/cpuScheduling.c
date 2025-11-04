@@ -26,22 +26,23 @@ double *FCFS(int **data) {
     init(&pList[i], data[0][i], data[1][i]);
   }
 
-  clock = pList[0].start;
-
   for (int j = 0; j < MAX_PROCESS; j++) {
+    if (pList[j].start > clock) {
+      clock = pList[j].start;
+    }
     pList[j].waitTime = clock - pList[j].start;
     printf("clock = %d ", clock);
     printf("WaitTime = %d \n", pList[j].waitTime);
-    pList[j].responseTime = pList->waitTime;
-    clock = clock + pList[j].duration;
-    pList[j].turnAround = clock;
+    pList[j].responseTime = pList[j].waitTime;
+    clock += pList[j].duration;
+    pList[j].turnAround = pList[j].waitTime + pList[j].duration;
   }
 
   for (int k = 0; k < MAX_PROCESS; k++) {
 
-    responseTime = responseTime + pList[k].responseTime;
-    turnAround = turnAround + pList[k].turnAround;
-    waitTime = waitTime + pList[k].waitTime;
+    responseTime += pList[k].responseTime;
+    turnAround += pList[k].turnAround;
+    waitTime += pList[k].waitTime;
   }
   stats[0] = responseTime / MAX_PROCESS;
   stats[1] = turnAround / MAX_PROCESS;
