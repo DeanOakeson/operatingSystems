@@ -1,5 +1,5 @@
 #include "cpuScheduling.h"
-#include <math.h>
+#include "linkList.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -33,9 +33,18 @@ int main() {
 
   int **data = readFile(stdin);
 
+  printf("First Come, First Serve\n");
   printStats(FCFS(data));
 
-  printf("STILL WORKING\n");
+  printf("Shortest Job First\n");
+  printStats(SJF(data));
+
+  printf("Shortest Remaining Job First\n");
+  printStats(SRTF(data));
+
+  printf("Round Robin");
+  printStats(RR(data, 100));
+
   free(data[0]);
   free(data[1]);
   free(data);

@@ -2,31 +2,20 @@
 #ifndef CPUSCHEDULING_H
 #define CPUSCHEDULING_H
 
+#include "linkList.h"
+#include "process.h"
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-#define MAX_PROCESS 20
-
-typedef struct {
-  int start;
-  int duration;
-  int waitTime;
-  int responseTime;
-  int turnAround;
-
-} process;
-
-void init(process *process, int start, int duration);
 
 void printStats(double *stats);
 
 double *FCFS(int **data);
 
-int *SJF(int *start, int *duration);
+double *SJF(int **data);
 
-int *SRTF(int *start, int *duration);
+double *SRTF(int **data);
 
-int *RR(int *start, int *duration, int quant);
+double *RR(int **data, int quant);
 
 #endif
